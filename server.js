@@ -15,6 +15,7 @@ const marked = require("marked");
 const app = express(); // Web framework to handle routing requests
 const routes = require("./app/routes");
 const { port, db, cookieSecret } = require("./config/config"); // Application config properties
+const Server = require('mongodb').Server;
 /*
 // Fix for A6-Sensitive Data Exposure
 // Load keys for establishing secure HTTPS connection
@@ -26,6 +27,25 @@ const httpsOptions = {
     cert: fs.readFileSync(path.resolve(__dirname, "./artifacts/cert/server.crt"))
 };
 */
+// let db = "mongodb://localhost:27017/nodegoat?
+// keepAlive=true&poolSize=30&autoReconnect=true&socketTimeoutMS=360000&connectTimeoutMS=360000";
+
+const options = {
+  "keepAlive": true,
+  // "poolSize":30,
+  "autoReconnect": true,
+  "socketTimeoutMS": 360000,
+  "connectTimeoutMS": 360000
+}
+
+// const mongoTest = new MongoClient(new Server("localhost", 27017, {"wtimeout": 360000, 'retryMiliSeconds': 360000, "numberOfRetries": 5}))
+// console.log(mongoTest)
+// mongoTest.connect(function(err, MongoClient) {
+//   const db = MongoClient.db("nodegoat");
+//   if (db) {
+//     console.log('got dbbbb !!')
+//   }
+// })
 
 MongoClient.connect(db, (err, db) => {
     if (err) {
@@ -64,6 +84,7 @@ MongoClient.connect(db, (err, db) => {
     app.use(nosniff());
     */
 
+
     // Adding/ remove HTTP Headers for security
     app.use(favicon(__dirname + "/app/assets/favicon.ico"));
 
@@ -82,22 +103,22 @@ MongoClient.connect(db, (err, db) => {
         secret: cookieSecret,
         // Both mandatory in Express v4
         saveUninitialized: true,
-        resave: true
+        resave: true,
         /*
         // Fix for A5 - Security MisConfig
         // Use generic cookie name
         key: "sessionId",
         */
 
-        /*
+        
         // Fix for A3 - XSS
         // TODO: Add "maxAge"
         cookie: {
-            httpOnly: true
+            httpOnly: true,
             // Remember to start an HTTPS server to get this working
-            // secure: true
+            secure: true
         }
-        */
+        
 
     }));
 
@@ -132,11 +153,11 @@ MongoClient.connect(db, (err, db) => {
     // Template system setup
     swig.setDefaults({
         // Autoescape disabled
-        autoescape: false
-        /*
+        autoescape: false,
+        
         // Fix for A3 - XSS, enable auto escaping
         autoescape: true // default value
-        */
+        
     });
 
     // Insecure HTTP connection

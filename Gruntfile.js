@@ -148,12 +148,12 @@ module.exports = function(grunt) {
     grunt.option("force", true);
 
     grunt.registerTask("db-reset", "(Re)init the database.", function(arg) {
+      try {
         var finalEnv = process.env.NODE_ENV || arg || "development";
         var done;
 
         done = this.async();
         var cmd = process.platform === "win32" ? "NODE_ENV=" + finalEnv + " & " : "NODE_ENV=" + finalEnv + " ";
-
         exec(
             cmd + "node artifacts/db-reset.js",
             function(err, stdout, stderr) {
@@ -167,6 +167,10 @@ module.exports = function(grunt) {
                 done();
             }
         );
+
+      } catch (error) {
+        console.log(error)
+      }
     });
 
     // Code Validation, beautification task(s).
